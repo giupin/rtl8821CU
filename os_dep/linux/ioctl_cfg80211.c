@@ -416,9 +416,11 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 
 	ret = rtw_chbw_to_cfg80211_chan_def(wiphy, &chdef, ch, bw, offset, ht);
 	if (ret != _SUCCESS)
 		goto exit;
-
-	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef);
-
+	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
+		cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0);
+	#else
+		cfg80211_ch_switch_notify(adapter->pnetdev, &chdef);
+	#endif
 #else
 	int freq = rtw_ch2freq(ch);
 	enum nl80211_channel_type ctype;
